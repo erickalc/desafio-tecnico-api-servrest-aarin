@@ -6,6 +6,8 @@ import org.apache.http.HttpStatus;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import server.rest.config.BaseTest;
 import server.rest.utils.UsuarioUtils;
 
@@ -27,13 +29,13 @@ public class UsuarioTest extends BaseTest {
     }
 
     @Test
-    @Severity(SeverityLevel.NORMAL)
+    @Severity(SeverityLevel.CRITICAL)
     @Story("Cadastro de usuário com sucesso")
     @Description("Este teste realiza o cadastro de um usuário com sucesso na API Serverest")
     @DisplayName("Deve cadastrar um usuário administrador com sucesso")
     public void cadastrarUsuario() {
 
-        String body_cadastrar_usuario = usuarioUtils.getBodyUsuario();
+        String body_cadastrar_usuario = usuarioUtils.getBodyUsuario("true");
 
         Response response_cadastro = usuarioUtils.cadastrarUsuario(body_cadastrar_usuario)
                 .then()
@@ -43,5 +45,44 @@ public class UsuarioTest extends BaseTest {
                 .extract().response();
 
         idUsuarioCadastrado = response_cadastro.jsonPath().getString("_id");
+    }
+
+    @Test
+    @Severity(SeverityLevel.CRITICAL)
+    @Story("Cadastro de usuário - Email em branco")
+    @Description("Este teste realizar o cadastro de um usuário com email em branco na API Serverest")
+    @DisplayName("Não deve permitir o cadastro de um usuário com email em branco")
+    public void cadastrarUsuarioComEmailEmBranco() {
+
+        String body_cadastrar_usuario = usuarioUtils.getBodyUsuario("true", "");
+
+        usuarioUtils.cadastrarUsuario(body_cadastrar_usuario)
+                .then()
+                .statusCode(HttpStatus.SC_BAD_REQUEST)
+                .body("email", equalTo("email não pode ficar em branco"));
+
+    }
+
+    @ParameterizedTest
+    @Severity(SeverityLevel.CRITICAL)
+    @Story("Cadastro de usuário - Email inválido")
+    @Description("Este teste realizar o cadastro de um usuário com email inválido na API Serverest")
+    @DisplayName("Não deve permitir o cadastro de um usuário com email inválido")
+    @ValueSource(strings = {
+            "email_sem_arroba.com",
+            "email@",
+            "@dominio.com",
+            "email@dominio",
+            "email com espaco@qa.com"
+    })
+    public void cadastrarUsuarioComEmailInvalido(String emailInvalido) {
+
+        String body_cadastrar_usuario = usuarioUtils.getBodyUsuario("true", emailInvalido);
+
+        usuarioUtils.cadastrarUsuario(body_cadastrar_usuario)
+                .then()
+                .statusCode(HttpStatus.SC_BAD_REQUEST)
+                .body("email", equalTo("email deve ser um email válido"));
+
     }
 }

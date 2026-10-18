@@ -11,20 +11,23 @@ import static io.restassured.RestAssured.given;
 
 public class ProdutoUtils {
 
-    Faker faker = new Faker(new Locale("pt-BR"));
-
-    String nomeProduto = faker.commerce().productName();
-    String preco = String.valueOf(faker.number().numberBetween(10, 500));
-    String descricao = faker.commerce().material();
-    String quantidade = String.valueOf(faker.number().numberBetween(1, 50));
+    private final Faker faker = new Faker(new Locale("pt-BR"));
 
     public String getBodyproduto() {
+        return getBodyproduto(gerarNomeProduto());
+    }
+
+    public String getBodyproduto(String nomeProduto) {
+        String preco = String.valueOf(faker.number().numberBetween(10, 500));
+        String descricao = faker.commerce().material();
+        String quantidade = String.valueOf(faker.number().numberBetween(1, 50));
+
         return "{\n" +
                 "  \"nome\": \"" + nomeProduto + "\",\n" +
                 "  \"preco\": " + preco + ",\n" +
                 "  \"descricao\": \"" + descricao + "\",\n" +
                 "  \"quantidade\": " + quantidade + "\n" +
-        "}";
+                "}";
     }
 
     @Step("Cadastrando produto na API ServeRest")
@@ -50,4 +53,9 @@ public class ProdutoUtils {
                 log().all().
                 statusCode(HttpStatus.SC_OK);
     }
+
+    public String gerarNomeProduto() {
+        return faker.commerce().productName();
+    }
+
 }

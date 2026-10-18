@@ -2,6 +2,7 @@ package server.rest.utils;
 
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
+import org.hamcrest.Condition;
 
 import static io.restassured.RestAssured.given;
 
@@ -31,8 +32,8 @@ public class CarrinhoUtils {
     }
 
 
-    @Step("Buscar carrinho pelo ID")
-    public Response buscarCarrinho(String idCarrinho, String bearerToken) {
+    @Step("Buscar carrinho pelo ID usando path param ID carrinho")
+    public Response buscarCarrinhoPorPathId(String idCarrinho, String bearerToken) {
         return given().
                 header("Authorization", bearerToken).
                 pathParam("_id", idCarrinho).
@@ -57,5 +58,25 @@ public class CarrinhoUtils {
                 log().all().
                 when().
                 delete(PATH_CARRINHO + "/cancelar-compra");
+    }
+
+    @Step("Buscar carrinho pelo ID usando query param ID carrinho")
+    public Response buscarCarrinhoPorQueryParamIdCarrinho(String idCarrinho, String bearerToken) {
+        return given().
+                header("Authorization", bearerToken).
+                queryParam("_id", idCarrinho).
+                log().all().
+                when().
+                get(PATH_CARRINHO);
+    }
+
+    @Step("Buscar carrinho pelo ID usando query param ID Usuário")
+    public Response buscarCarrinhoPorQueryParamIdUsuario(String idUsuario, String bearerToken) {
+        return given().
+                header("Authorization", bearerToken).
+                queryParam("idUsuario", idUsuario).
+                log().all().
+                when().
+                get(PATH_CARRINHO);
     }
 }

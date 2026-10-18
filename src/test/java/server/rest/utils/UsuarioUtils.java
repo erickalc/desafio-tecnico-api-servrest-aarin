@@ -1,12 +1,14 @@
 package server.rest.utils;
 
 import com.github.javafaker.Faker;
+import io.qameta.allure.Epic;
 import io.qameta.allure.Step;
 import io.restassured.response.Response;
 
 import java.util.Locale;
 
 import static io.restassured.RestAssured.given;
+
 
 public class UsuarioUtils {
 
@@ -18,13 +20,17 @@ public class UsuarioUtils {
     private final String email = (nome + "." + sobrenome + "@qa.com.br").replaceAll("\\s+", "").toLowerCase();
     private final String password = (sobrenome + "$" + "123").replaceAll("\\s+", "").toLowerCase();
 
-    public String getBodyUsuario(){
+    public String getBodyUsuario(String admin){
+        return getBodyUsuario(admin, this.email);
+    }
+
+    public String getBodyUsuario(String admin, String emailInformado){
 
         return "{\n" +
                 "  \"nome\": " + "\""+ nome + " " + sobrenome + "\"" + ",\n" +
-                "  \"email\": " + "\"" + email + "\"" + ",\n" +
+                "  \"email\": " + "\"" + emailInformado + "\"" + ",\n" +
                 "  \"password\": " + "\"" + password + "\"" + ",\n" +
-                "  \"administrador\": " + "\"" + "true" + "\"" + "\n" +
+                "  \"administrador\": " + "\"" + admin + "\"" + "\n" +
                 "}";
     }
 
@@ -54,5 +60,4 @@ public class UsuarioUtils {
     public String getPassword(){
         return password;
     }
-
 }

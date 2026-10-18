@@ -21,6 +21,7 @@ public class CarrinhoTest extends BaseTest {
 
     private static String bearerToken;
     private String idProdutoCadastrado;
+    private String idUsuarioCadastrado;
 
     @BeforeEach
     public void setupMassaCadastro() {
@@ -28,10 +29,12 @@ public class CarrinhoTest extends BaseTest {
         UsuarioUtils usuarioUtils = new UsuarioUtils();
         LoginUtils loginUtils = new LoginUtils();
 
-        String bodyCadastro = usuarioUtils.getBodyUsuario();
-        usuarioUtils.cadastrarUsuario(bodyCadastro).
+        String bodyCadastro = usuarioUtils.getBodyUsuario("true");
+        idUsuarioCadastrado = usuarioUtils.cadastrarUsuario(bodyCadastro).
                 then().
-                statusCode(HttpStatus.SC_CREATED);
+                statusCode(HttpStatus.SC_CREATED).
+                extract().
+                path("_id");
 
         // Realiza o login do usuário Admin e obtém o token Bearer
         String bodyLogin = loginUtils.getBodyLogin(usuarioUtils.getEmail(), usuarioUtils.getPassword());
@@ -58,6 +61,7 @@ public class CarrinhoTest extends BaseTest {
     @DisplayName("Deve realizar o fluxo principal de compra com sucesso e verificar a sensibilização do estoque do produto")
     public void fluxoPrincipalDeCompraComSucesso() {
 
+        // Busca informações do produto para verificar a quantidade em estoque antes da compra
         int estoqueinicial =
         given().
                 header("Authorization", bearerToken).
@@ -73,6 +77,7 @@ public class CarrinhoTest extends BaseTest {
                 extract().
                 path("quantidade");
 
+        // Cadastra um carrinho com o produto e a quantidade desejada
         CarrinhoUtils carrinhoUtils = new CarrinhoUtils();
         int quantidadeItensCarrinho = 1;
 
@@ -91,7 +96,7 @@ public class CarrinhoTest extends BaseTest {
         });
 
         Allure.step("Busca informações do carrinho para verificar se o produto foi adicionado corretamente", () -> {
-            carrinhoUtils.buscarCarrinho(id_Carrinho, bearerToken).
+            carrinhoUtils.buscarCarrinhoPorPathId(id_Carrinho, bearerToken).
                     then().
                     log().all().
                     statusCode(HttpStatus.SC_OK).
@@ -100,7 +105,7 @@ public class CarrinhoTest extends BaseTest {
                     body("produtos[0].quantidade", equalTo(1));
         });
 
-        // // Conclui a compra do carrinho
+        // Conclui a compra do carrinho
         carrinhoUtils.concluirCompra(bearerToken).
                 then().
                 log().all().
@@ -108,7 +113,7 @@ public class CarrinhoTest extends BaseTest {
                 body("message", equalTo("Registro excluído com sucesso"));
 
         // Busca informações do carrinho após a conclusão da compra
-        carrinhoUtils.buscarCarrinho(id_Carrinho, bearerToken).
+        carrinhoUtils.buscarCarrinhoPorPathId(id_Carrinho, bearerToken).
                 then().
                 log().all().
                 statusCode(HttpStatus.SC_BAD_REQUEST).
@@ -116,6 +121,48 @@ public class CarrinhoTest extends BaseTest {
 
         Allure.step("Verificar atualização do estoque do produto após a compra ou cancelamento");
         verificaAtualizacaoEstoque(estoqueinicial, quantidadeItensCarrinho);
+    }
+
+    @Test
+    @Severity(SeverityLevel.BLOCKER)
+    @Story("Fluxo Principal de Compra Com Sucesso - Listagem por filtro de produtos (Query param)")
+    @Description("Este teste realiza o fluxo principal de compra e verifica a listagem de produtos por filtro (query param) após a compra")
+    @DisplayName("Deve realizar o fluxo principal de compra  e verificar a listagem de produtos por filtro (query param) após a compra")
+    public void fluxoPrincipalDeCompraEverificacaoDeListagemPorFiltro() {
+
+        CarrinhoUtils carrinhoUtils = new CarrinhoUtils();
+        int quantidadeItensCarrinho = 1;
+
+        String bodyCarrinho = carrinhoUtils.getBodyCarrinho(idProdutoCadastrado, quantidadeItensCarrinho);
+
+        String id_Carrinho = carrinhoUtils.cadastrandoCarrinho(bodyCarrinho, bearerToken).
+                then().
+                statusCode(HttpStatus.SC_CREATED).
+                body("message", equalTo("Cadastro realizado com sucesso")).
+                body("_id", notNullValue()).
+                extract().
+                path("_id");
+
+
+        Allure.step("Busca informações do carrinho por query param informando o ID do carrinho", () -> {
+            carrinhoUtils.buscarCarrinhoPorQueryParamIdCarrinho(id_Carrinho, bearerToken).
+                    then().
+                    log().all().
+                    statusCode(HttpStatus.SC_OK).
+                    body("carrinhos[0]._id", equalTo(id_Carrinho)).
+                    body("carrinhos[0].produtos[0].idProduto", equalTo(idProdutoCadastrado)).
+                    body("carrinhos[0].produtos[0].quantidade", equalTo(quantidadeItensCarrinho));
+        });
+
+        Allure.step("Busca informações do carrinho por query param informando o ID do usuário", () -> {
+            carrinhoUtils.buscarCarrinhoPorQueryParamIdUsuario(idUsuarioCadastrado, bearerToken).
+                    then().
+                    log().all().
+                    statusCode(HttpStatus.SC_OK).
+                    body("carrinhos[0].idUsuario", equalTo(idUsuarioCadastrado)).
+                    body("carrinhos[0].produtos[0].idProduto", equalTo(idProdutoCadastrado)).
+                    body("carrinhos[0].produtos[0].quantidade", equalTo(quantidadeItensCarrinho));
+        });
     }
 
     @Test
@@ -158,7 +205,7 @@ public class CarrinhoTest extends BaseTest {
         });
 
         Allure.step("Busca informações do carrinho para verificar se o produto foi adicionado corretamente", () -> {
-            carrinhoUtils.buscarCarrinho(id_Carrinho, bearerToken).
+            carrinhoUtils.buscarCarrinhoPorPathId(id_Carrinho, bearerToken).
                     then().
                     log().all().
                     statusCode(HttpStatus.SC_OK).
@@ -175,7 +222,7 @@ public class CarrinhoTest extends BaseTest {
                 body("message", equalTo("Registro excluído com sucesso. Estoque dos produtos reabastecido"));
 
         // Busca informações do carrinho após a conclusão da compra
-        carrinhoUtils.buscarCarrinho(id_Carrinho, bearerToken).
+        carrinhoUtils.buscarCarrinhoPorPathId(id_Carrinho, bearerToken).
                 then().
                 log().all().
                 statusCode(HttpStatus.SC_BAD_REQUEST).
@@ -213,7 +260,7 @@ public class CarrinhoTest extends BaseTest {
                 body("message", equalTo("Não é permitido ter mais de 1 carrinho"));
 
         Allure.step("Busca informações do carrinho para verificar se o produto foi adicionado corretamente", () -> {
-            carrinhoUtils.buscarCarrinho(id_Carrinho, bearerToken).
+            carrinhoUtils.buscarCarrinhoPorPathId(id_Carrinho, bearerToken).
                     then().
                     log().all().
                     statusCode(HttpStatus.SC_OK).

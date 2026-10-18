@@ -36,7 +36,7 @@ public class LoginTest extends BaseTest {
     public void loginComSucesso(){
         // Cadastrando um usuário para realizar o login
         UsuarioUtils usuarioUtils = new UsuarioUtils();
-        String bodyCadastro = usuarioUtils.getBodyUsuario();
+        String bodyCadastro = usuarioUtils.getBodyUsuario("true");
 
         idUsuarioCadastrado = usuarioUtils.cadastrarUsuario(bodyCadastro).
                 then().
@@ -66,7 +66,7 @@ public class LoginTest extends BaseTest {
     public void naoDeveAutenticarComSenhaInvalida() {
         // Cadastrando um usuário para realizar o login
         UsuarioUtils usuarioUtils = new UsuarioUtils();
-        String bodyCadastro = usuarioUtils.getBodyUsuario();
+        String bodyCadastro = usuarioUtils.getBodyUsuario("true");
 
         idUsuarioCadastrado = usuarioUtils.cadastrarUsuario(bodyCadastro).
                 then().
@@ -93,7 +93,7 @@ public class LoginTest extends BaseTest {
     public void naoDeveAutenticarSemEmail() {
         // Cadastrando um usuário para realizar o login
         UsuarioUtils usuarioUtils = new UsuarioUtils();
-        String bodyCadastro = usuarioUtils.getBodyUsuario();
+        String bodyCadastro = usuarioUtils.getBodyUsuario("true");
 
         idUsuarioCadastrado = usuarioUtils.cadastrarUsuario(bodyCadastro).
                 then().
