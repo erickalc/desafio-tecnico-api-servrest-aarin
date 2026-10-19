@@ -127,7 +127,7 @@ Detalhe sua hipótese inicial e como reduziria a incerteza rapidamente.
 Minha primeira ação seria conversar com meu time para deixar todos cientes do problema e verificarmos as possibilidades de investigação disponíveis. 
 
 Verificar qual abordagem seria melhor para comunicar ao time de produtos e analisar os impactos financeiros dos clientes afetados.
-Coletando junto a ele amostras de clientes para iniciar a investigação com os logs disponíveis.
+Coletando junto a eles amostras de clientes para iniciar a investigação com os logs disponíveis.
 
 A partir disso, com algumas amostras de evidências, levar ao time de BeckEnd para analisar os logs de transações e identificar se há algum padrão ou condição específica que leva à falha.
 
