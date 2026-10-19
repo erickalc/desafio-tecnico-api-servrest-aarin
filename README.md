@@ -92,6 +92,10 @@ mvn clean test "-Dtest=CarrinhoTest"
 ```
 Os resultados e os dados do Allure em `target\allure-results`.
 
+Caso você não tenha o maven instalado, pode-se executar seguindo os passos pela IDE do intellij:
+
+<img width="884" height="831" alt="passo-a-passo-test" src="https://github.com/user-attachments/assets/37a70338-4b90-4f83-9553-25f3ffefd907" />
+
 ## Visualizar o relatório Allure
 
 Depois de executar os testes:
@@ -107,11 +111,12 @@ As anotações `@Epic`, `@Feature`, `@Story` e `@Severity` organizam o relatóri
 
 Com resultados de testes disponíveis, execute:
 
+(Esse passo também é possível, realizando o passo a passo via IDE do intellij acima, e no final, rodar esse comando abaixo para gerar o .html para download. 
 ```powershell
-mvn allure:report
 .\.allure\allure-2.27.0\bin\allure.bat generate .\target\allure-results --single-file --clean -o .\target\allure-compartilhavel
 ```
 O arquivo `target\allure-compartilhavel\index.html` pode ser aberto diretamente no navegador de outra máquina, sem Maven ou servidor local.
+
 
 ## Desafio de Investigação 
 
