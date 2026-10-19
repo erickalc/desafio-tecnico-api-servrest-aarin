@@ -16,7 +16,7 @@ Os testes verificam cadastro de usuários, autenticação, cadastro de produtos 
 | Allure | 2.27.0           | Relatórios, etapas e anexos              |
 | AspectJ Weaver | 1.9.22.1         | Captura dos métodos anotados com `@Step` |
 
-## Pre-requisitos
+## Pré-requisitos
 
 - JDK - recomenda-se JDK 17.
 - Maven instalado e disponível no terminal, com `JAVA_HOME` apontando para o JDK.
@@ -47,6 +47,7 @@ Os testes verificam cadastro de usuários, autenticação, cadastro de produtos 
 | Carrinho com múltiplos produtos parcialmente processado | Se um item for inválido (inexistente, duplicação) ou não tiver estoque, existe o risco de reservar os demais sem criar um carrinho válido. |
 | Referências inconsistentes entre recursos | A exclusão de usuário ou produto associado a um carrinho pode deixar registros inválidos se as restrições não forem respeitadas.                         |
 | Repetição de conclusão ou cancelamento | Repetir a operação não deve provocar novas alterações indevidas no estoque.                                                                                 |
+
 ### Escopo testado
 
 Foram priorizados os fluxos funcionais de maior impacto e suas
