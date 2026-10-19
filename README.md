@@ -32,20 +32,21 @@ Os testes verificam cadastro de usuários, autenticação, cadastro de produtos 
 | `CarrinhoTest` | Conclusão de compra, consulta de carrinho por query param (`_id` e `idUsuario`), cancelamento com reposição de estoque, bloqueio de segundo carrinho e quantidade superior ao estoque | **Fluxo de compra, cancelamento e validação de estoque (`BLOCKER`/`CRITICAL`):** representa o *core business* (geração de receita) e protege a integridade do inventário contra venda sem estoque (*overselling*), baixa duplicada ou perda de itens no cancelamento. |
 
 `OBS: A classificação em BLOCKER/CRITICAL e as demais anotações seguem a convenção do Allure, com base no impacto do cenário no fluxo de negócio.`
+
 ### Riscos identificados durante o mapeamento
 
-| Risco | Impacto no fluxo                                                                                                                           |
-| --- |--------------------------------------------------------------------------------------------------------------------------------------------|
-| Acesso indevido a operações administrativas | Um usuário comum conseguir cadastrar, alterar ou excluir produtos sem a permissão necessária.                                              |
-| Estoque insuficiente não validado | Permitir um carrinho com quantidade superior à disponível pode gerar venda sem estoque.                                                    |
-| Baixa incorreta de estoque | A criação do carrinho pode descontar uma quantidade diferente da solicitada ou deixar de realizar a baixa.                                 |
-| Desconto duplicado na conclusão | Como a reserva ocorre na criação do carrinho, concluir a compra não deve descontar o estoque novamente.                                    |
-| Reposição incorreta no cancelamento | Cancelar uma compra pode não devolver os itens reservados ou devolver uma quantidade superior à original.                                  |
-| Mais de um carrinho por usuário | Pode violar a regra de carrinho único e gerar reservas adicionais de estoque.                                                              |
-| Alteração de estoque em requisições rejeitadas | Uma tentativa inválida, como criar um segundo carrinho, não deve modificar o estoque.                                                      |
+| Risco | Impacto no fluxo                                                                                                                                                                             |
+| --- |--------------------------------------------------------------------------------------------------------------------------------------------                                                    |
+| Acesso indevido a operações administrativas | Um usuário comum conseguir cadastrar, alterar ou excluir produtos sem a permissão necessária.                                                          |
+| Estoque insuficiente não validado | Permitir um carrinho com quantidade superior à disponível pode gerar venda sem estoque.                                                                          |
+| Baixa incorreta de estoque | A criação do carrinho pode descontar uma quantidade diferente da solicitada ou deixar de realizar a baixa.                                                              |
+| Desconto duplicado na conclusão | Como a reserva ocorre na criação do carrinho, concluir a compra não deve descontar o estoque novamente.                                                            |
+| Reposição incorreta no cancelamento | Cancelar uma compra pode não devolver os itens reservados ou devolver uma quantidade superior à original.                                                      |
+| Mais de um carrinho por usuário | Pode violar a regra de carrinho único e gerar reservas adicionais de estoque.                                                                                      |
+| Alteração de estoque em requisições rejeitadas | Uma tentativa inválida, como criar um segundo carrinho, não deve modificar o estoque.                                                               |
 | Carrinho com múltiplos produtos parcialmente processado | Se um item for inválido (inexistente, duplicação) ou não tiver estoque, existe o risco de reservar os demais sem criar um carrinho válido. |
-| Referências inconsistentes entre recursos | A exclusão de usuário ou produto associado a um carrinho pode deixar registros inválidos se as restrições não forem respeitadas.           |
-| Repetição de conclusão ou cancelamento | Repetir a operação não deve provocar novas alterações indevidas no estoque.                                                                |
+| Referências inconsistentes entre recursos | A exclusão de usuário ou produto associado a um carrinho pode deixar registros inválidos se as restrições não forem respeitadas.                         |
+| Repetição de conclusão ou cancelamento | Repetir a operação não deve provocar novas alterações indevidas no estoque.                                                                                 |
 ### Escopo testado
 
 Foram priorizados os fluxos funcionais de maior impacto e suas
@@ -79,21 +80,17 @@ A priorização seguiu a estratégia de **Testes Baseados em Risco**, concentran
 
 ## Executar os testes
 
-Executar toda a suite com resultados novos:
+Executar toda a suíte com resultados novos:
 
 ```powershell
 mvn clean test
 ```
-
 Executar somente uma classe:
 
 ```powershell
 mvn clean test "-Dtest=CarrinhoTest"
 ```
-
 Os resultados e os dados do Allure em `target\allure-results`.
-
-Os testes dependem de uma API pública compartilhada e criam dados reais nesse ambiente. Dados gerados aleatoriamente podem colidir com registros existentes.
 
 ## Visualizar o relatório Allure
 
@@ -102,18 +99,7 @@ Depois de executar os testes:
 ```powershell
 mvn allure:serve
 ```
-
 O comando gera o relatório e inicia um servidor local para visualização no navegador. Use `Ctrl+C` para encerrar o servidor.
-
-Também é possível executar os testes e abrir o relatório em um comando:
-
-```powershell
-mvn clean test allure:serve
-```
-
-Se os testes falharem, o Maven interrompe a sequencia. Nesse caso, execute `mvn allure:serve` separadamente para visualizar os resultados que foram gerados.
-
-Não é necessário executar `allure:report` antes de `allure:serve`. O comando `mvn allure:report` serve para salvar o relatório em `target\site\allure-maven-plugin`. Não abra esse HTML convencional diretamente pelo protocolo `file://`, pois o navegador pode bloquear o carregamento dos dados.
 
 As anotações `@Epic`, `@Feature`, `@Story` e `@Severity` organizam o relatório.
 
@@ -125,7 +111,6 @@ Com resultados de testes disponíveis, execute:
 mvn allure:report
 .\.allure\allure-2.27.0\bin\allure.bat generate .\target\allure-results --single-file --clean -o .\target\allure-compartilhavel
 ```
-
 O arquivo `target\allure-compartilhavel\index.html` pode ser aberto diretamente no navegador de outra máquina, sem Maven ou servidor local.
 
 ## Desafio de Investigação 
