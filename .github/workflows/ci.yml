@@ -9,6 +9,10 @@ name: Testes Automatizados ServeRest
       - master
       - main
   workflow_dispatch: null
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -23,10 +27,13 @@ jobs:
           cache: maven
       - name: Executar Testes com Maven
         run: mvn clean test
-      - name: Salvar Artefatos do Allure
+      - name: Gerar Allure Report HTML
+        if: always()
+        run: 'mvn allure:report'
+      - name: Salvar Artefato HTML do Allure
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: allure-results
-          path: target/allure-results
+          name: allure-report-html
+          path: target/site/allure-maven-plugin
           retention-days: 5
